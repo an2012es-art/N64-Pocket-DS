@@ -1,35 +1,13 @@
 
-name: Build N64PocketDS
-
-on:
-  push:
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get source
-        uses: actions/checkout@v4
-
       - name: Install devkitPro tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential
-          wget -U "Mozilla/5.0" https://apt.devkitpro.org/install-devkitpro-pacman
+          sudo apt-get install -y curl
+          curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0" \
+            -o install-devkitpro-pacman \
+            https://apt.devkitpro.org/install-devkitpro-pacman
+          test -s install-devkitpro-pacman
+          head -n 5 install-devkitpro-pacman
           chmod +x install-devkitpro-pacman
           sudo ./install-devkitpro-pacman
-          sudo dkp-pacman -S --noconfirm nds-dev
-
-      - name: Build NDS
-        shell: bash
-        run: |
-          export DEVKITPRO=/opt/devkitpro
-          export DEVKITARM=$DEVKITPRO/devkitARM
-          make
-
-      - name: Upload NDS file
-        uses: actions/upload-artifact@v4
-        with:
-          name: N64PocketDS
-          path: "*.nds"
+          sudo dkp-pacman -Syu --noconfirm nds-dev
